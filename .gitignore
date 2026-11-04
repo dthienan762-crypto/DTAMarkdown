@@ -1,0 +1,45 @@
+# Teamwork & Agent Metadata
+.agents/
+.worktrees/
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+env/
+ENV/
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+build/
+dist/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+coverage/
+.playwright/
+test-results/
+
+# Temporary & Staging
+temp/
+tmp/
+*.tmp
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE & OS
+.vscode/
+.idea/
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store

@@ -1,0 +1,649 @@
+openapi: 3.1.0
+info:
+  title: DTAMarkdown Studio API
+  version: 1.0.0
+  description: |
+    Production REST & WebSocket API specification for DTAMarkdown Studio.
+    Provides multimodal document, image, audio, and text conversion to GitHub Flavored Markdown (GFM)
+    with KaTeX mathematical formulas, preserved table structures, and real-time streaming chunks.
+  contact:
+    name: DTAMarkdown Studio Engineering Team
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+paths:
+  /api/v1/convert/file:
+    post:
+      summary: Upload file for multimodal conversion
+      description: |
+        Accepts documents (PDF), images (PNG, JPG, TIFF, WebP), or audio recordings (WAV, MP3).
+        Validates file size and format, stages the file securely in a temporary sandbox,
+        creates an asynchronous job, and returns the job ID along with the WebSocket stream URL.
+      operationId: convertFile
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Uploaded document, image, or audio binary file.
+                pipeline_type:
+                  $ref: '#/components/schemas/PipelineType'
+                  default: auto
+                  description: Target pipeline. If 'auto', the engine infers pipeline based on MIME type.
+                options_json:
+                  type: string
+                  description: Optional JSON-encoded ConversionOptions object.
+                  example: '{"extract_tables": true, "extract_math": true, "generate_toc": true}'
+      responses:
+        '202':
+          description: File accepted and queued for processing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobCreatedResponse'
+        '400':
+          description: Bad request (malformed options JSON, invalid parameters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '415':
+          description: Unsupported media type (unrecognized file extension or corrupt header).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error in form parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error during staging.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/convert/text:
+    post:
+      summary: Convert raw text or HTML to Markdown
+      description: |
+        Processes messy HTML, unclosed tags, or unstructured raw text into sanitized GFM Markdown.
+        Flattens tables, resolves colspan/rowspan, preserves KaTeX formulas, and optionally generates
+        a hierarchical Table of Contents and YAML frontmatter.
+      operationId: convertText
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - raw_text
+              properties:
+                raw_text:
+                  type: string
+                  description: Unstructured raw text or messy HTML input.
+                  example: "<table><tr><th>Metric</th><th>Value</th></tr><tr><td>Accuracy</td><td>98.5%</td></tr></table>"
+                pipeline_type:
+                  $ref: '#/components/schemas/PipelineType'
+                  default: text_normalize
+                options:
+                  $ref: '#/components/schemas/ConversionOptions'
+      responses:
+        '200':
+          description: Synchronous text conversion completed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversionResult'
+        '400':
+          description: Bad request or empty text payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Schema validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal conversion failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/jobs/{job_id}:
+    get:
+      summary: Retrieve job status and conversion result
+      description: |
+        Polls the execution state of an asynchronous multimodal conversion job.
+        Used as a fallback when WebSocket connection is unavailable or after stream completion.
+      operationId: getJob
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          description: Unique UUIDv4 job identifier.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Job status and available results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDetailResponse'
+        '404':
+          description: Job not found or expired from cache.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/export/pdf:
+    post:
+      summary: Compile Markdown to PDF binary
+      description: |
+        Accepts a Markdown document with optional KaTeX and table markup, compiles it into
+        a print-ready PDF binary, and returns it with appropriate download headers.
+      operationId: exportPdf
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PdfExportRequest'
+      responses:
+        '200':
+          description: Rendered PDF document.
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: 'attachment; filename="document.pdf"'
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad request or empty Markdown content.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: PDF compilation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/health:
+    get:
+      summary: System health check and engine telemetry
+      description: |
+        Returns the operational status of the backend server, system uptime, active jobs,
+        and availability of local/cloud AI conversion engines (PyMuPDF, Gemini, RapidOCR, Whisper).
+      operationId: getHealth
+      responses:
+        '200':
+          description: System is healthy and operational.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Service degraded or shutting down.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/ws/stream/{job_id}:
+    get:
+      summary: WebSocket real-time progressive Markdown streaming channel
+      description: |
+        Full-duplex WebSocket connection used to stream incremental Markdown chunks,
+        operational progress updates, and completion metadata directly to the frontend.
+        Client initiates HTTP Upgrade to WebSocket at `ws://localhost:8000/api/v1/ws/stream/{job_id}`.
+      operationId: streamJobWebSocket
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          description: UUIDv4 of the active conversion job.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '101':
+          description: Switching Protocols to WebSocket.
+          headers:
+            Upgrade:
+              schema:
+                type: string
+                example: websocket
+            Connection:
+              schema:
+                type: string
+                example: Upgrade
+
+components:
+  schemas:
+    PipelineType:
+      type: string
+      enum:
+        - auto
+        - vision_ocr
+        - voice_stt
+        - text_normalize
+      description: Multimodal conversion pipeline identifier.
+
+    JobStatus:
+      type: string
+      enum:
+        - QUEUED
+        - PROCESSING
+        - STREAMING
+        - COMPLETED
+        - FAILED
+        - CANCELLED
+      description: Lifecycle state of an asynchronous processing job.
+
+    ConversionOptions:
+      type: object
+      properties:
+        extract_tables:
+          type: boolean
+          default: true
+          description: Detect tabular data and format into GFM tables.
+        extract_math:
+          type: boolean
+          default: true
+          description: Detect math formulas and enclose in KaTeX delimiters ($..$, $$..$$).
+        generate_toc:
+          type: boolean
+          default: true
+          description: Auto-generate hierarchical Table of Contents with slug anchors.
+        extract_tags:
+          type: boolean
+          default: true
+          description: Extract keyword tags and generate YAML frontmatter.
+        timestamp_silence_threshold:
+          type: number
+          format: float
+          default: 2.0
+          minimum: 0.5
+          maximum: 10.0
+          description: Audio pause duration in seconds to trigger a new timestamped paragraph.
+        preferred_engine:
+          type: string
+          enum:
+            - auto
+            - gemini
+            - local_onnx
+            - pymupdf_fast
+          default: auto
+          description: Preferred underlying conversion engine.
+
+    ConversionMetadata:
+      type: object
+      properties:
+        word_count:
+          type: integer
+          example: 450
+        character_count:
+          type: integer
+          example: 2890
+        estimated_read_time:
+          type: string
+          example: "2 min"
+        duration_ms:
+          type: number
+          format: float
+          example: 1240.5
+        engine_used:
+          type: string
+          example: "Gemini Vision Multimodal API"
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["Financial Report", "Tables", "Q4-2026"]
+        warnings:
+          type: array
+          items:
+            type: string
+          example: []
+        toc:
+          type: string
+          example: "- [Executive Summary](#executive-summary)\n- [Financials](#financials)"
+
+    ConversionResult:
+      type: object
+      required:
+        - success
+        - pipeline
+        - markdown
+        - duration_ms
+      properties:
+        job_id:
+          type: string
+          format: uuid
+        success:
+          type: boolean
+          example: true
+        pipeline:
+          $ref: '#/components/schemas/PipelineType'
+        markdown:
+          type: string
+          description: Pristine GitHub Flavored Markdown output.
+        metadata:
+          $ref: '#/components/schemas/ConversionMetadata'
+        warnings:
+          type: array
+          items:
+            type: string
+          example: []
+        duration_ms:
+          type: number
+          format: float
+          example: 840.2
+
+    JobCreatedResponse:
+      type: object
+      required:
+        - job_id
+        - status
+        - pipeline
+        - created_at
+        - stream_url
+      properties:
+        job_id:
+          type: string
+          format: uuid
+          example: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+        status:
+          $ref: '#/components/schemas/JobStatus'
+          example: QUEUED
+        pipeline:
+          $ref: '#/components/schemas/PipelineType'
+          example: vision_ocr
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-11-04T16:00:00Z"
+        stream_url:
+          type: string
+          example: "/api/v1/ws/stream/9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+
+    JobDetailResponse:
+      type: object
+      required:
+        - job_id
+        - status
+        - pipeline
+        - created_at
+      properties:
+        job_id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        pipeline:
+          $ref: '#/components/schemas/PipelineType'
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 100
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        result:
+          $ref: '#/components/schemas/ConversionResult'
+          nullable: true
+        error:
+          $ref: '#/components/schemas/ErrorResponse'
+          nullable: true
+
+    PdfExportRequest:
+      type: object
+      required:
+        - markdown
+      properties:
+        markdown:
+          type: string
+          description: Source Markdown text with KaTeX formulas and GFM tables.
+          example: "# Title\n\n| Item | Cost |\n|---|---|\n| Book | $20 |"
+        title:
+          type: string
+          default: "Document"
+          example: "Financial Report"
+        page_size:
+          type: string
+          enum: [A4, Letter, Legal]
+          default: A4
+        orientation:
+          type: string
+          enum: [portrait, landscape]
+          default: portrait
+        include_styles:
+          type: boolean
+          default: true
+          description: Embed typography styling, table borders, and KaTeX math fonts.
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - version
+        - uptime_seconds
+        - engines_available
+        - active_jobs
+      properties:
+        status:
+          type: string
+          example: "HEALTHY"
+        version:
+          type: string
+          example: "1.0.0"
+        uptime_seconds:
+          type: number
+          format: float
+          example: 3600.0
+        engines_available:
+          type: object
+          properties:
+            pymupdf_fast:
+              type: boolean
+              example: true
+            gemini_vision:
+              type: boolean
+              example: true
+            rapidocr_onnx:
+              type: boolean
+              example: true
+            faster_whisper:
+              type: boolean
+              example: true
+            speech_recognition:
+              type: boolean
+              example: true
+        active_jobs:
+          type: integer
+          example: 0
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+        - timestamp
+      properties:
+        code:
+          type: string
+          example: "INVALID_FILE_FORMAT"
+        message:
+          type: string
+          example: "The uploaded file format is not supported."
+        details:
+          type: object
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-11-04T16:00:00Z"
+
+    # --- WebSocket Streaming Frame Schemas ---
+    WebSocketFrame:
+      type: object
+      discriminator:
+        propertyName: event
+      oneOf:
+        - $ref: '#/components/schemas/WebSocketStatusFrame'
+        - $ref: '#/components/schemas/WebSocketChunkFrame'
+        - $ref: '#/components/schemas/WebSocketCompleteFrame'
+        - $ref: '#/components/schemas/WebSocketErrorFrame'
+
+    WebSocketStatusFrame:
+      type: object
+      required:
+        - event
+        - job_id
+        - stage
+        - progress
+        - message
+        - timestamp
+      properties:
+        event:
+          type: string
+          enum: [status]
+          example: status
+        job_id:
+          type: string
+          format: uuid
+        stage:
+          type: string
+          example: "ocr_layout_analysis"
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 35
+        message:
+          type: string
+          example: "Extracting tables and KaTeX formulas..."
+        timestamp:
+          type: string
+          format: date-time
+
+    WebSocketChunkFrame:
+      type: object
+      required:
+        - event
+        - job_id
+        - delta
+        - index
+        - timestamp
+      properties:
+        event:
+          type: string
+          enum: [chunk]
+          example: chunk
+        job_id:
+          type: string
+          format: uuid
+        delta:
+          type: string
+          description: Incremental Markdown text chunk.
+          example: "| Quarter | Revenue |\n|---|---|\n| Q1 | $1.2M |\n"
+        index:
+          type: integer
+          minimum: 0
+          description: Monotonically increasing chunk sequence number.
+          example: 3
+        timestamp:
+          type: string
+          format: date-time
+
+    WebSocketCompleteFrame:
+      type: object
+      required:
+        - event
+        - job_id
+        - markdown
+        - metadata
+        - timestamp
+      properties:
+        event:
+          type: string
+          enum: [complete]
+          example: complete
+        job_id:
+          type: string
+          format: uuid
+        markdown:
+          type: string
+          description: Full accumulated Markdown document.
+        metadata:
+          $ref: '#/components/schemas/ConversionMetadata'
+        timestamp:
+          type: string
+          format: date-time
+
+    WebSocketErrorFrame:
+      type: object
+      required:
+        - event
+        - job_id
+        - code
+        - message
+        - recoverable
+        - timestamp
+      properties:
+        event:
+          type: string
+          enum: [error]
+          example: error
+        job_id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: "DEGRADED_IMAGE_CONTRAST"
+        message:
+          type: string
+          example: "Image contrast too low for optical character recognition."
+        recoverable:
+          type: boolean
+          example: false
+        timestamp:
+          type: string
+          format: date-time
