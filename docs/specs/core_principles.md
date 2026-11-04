@@ -67,7 +67,7 @@ To guarantee high availability, cross-platform reproducibility, sub-second inter
 - Long-running CPU-bound or GPU-bound operations (e.g., PyMuPDF rendering, ONNX inference, audio decoding) must execute in thread pools using `asyncio.to_thread` or non-blocking event loops, preventing the FastAPI main thread from dropping concurrent WebSocket heartbeats.
 
 #### 2.3 Resilient Connection Lifecycle
-- If a client disconnects (`WebSocketDisconnect`), the backend must signal a `cancellation_event` to the pipeline worker, aborting downstream inference and releasing memory immediately.
+- If a client disconnects (`WebSocketDisconnect`), background job execution continues detached for at least 60 seconds so the client can reconnect or retrieve the final result via polling `GET /api/v1/jobs/{job_id}`. If neither reconnect nor poll occurs within this 60-second grace window, the backend signals a `cancellation_event` to the pipeline worker, aborting downstream inference and releasing memory.
 - If a client fails to connect via WebSocket (e.g., corporate proxy blocking WS), the system provides an asynchronous polling fallback via `GET /api/v1/jobs/{job_id}`.
 
 ---
@@ -92,6 +92,9 @@ To guarantee high availability, cross-platform reproducibility, sub-second inter
 #### 3.3 Autonomous Background Sweeper (Reaper)
 - An asynchronous background task (`TempReaperService`) boots with the FastAPI server and runs every **10 minutes**.
 - The sweeper scans `dtamarkdown_staging` and forcibly deletes any orphaned files whose last modification time exceeds **30 minutes**, ensuring 0% disk accumulation over long uptimes.
+
+#### 3.4 Startup Staging Sweep
+- During FastAPI lifespan startup, `TempReaperService` executes an immediate synchronous sweep of `dtamarkdown_staging` to purge or quarantine any orphaned files remaining from previous unexpected process crashes.
 
 ---
 

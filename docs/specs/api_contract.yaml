@@ -50,7 +50,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/JobCreatedResponse'
         '400':
-          description: Bad request (malformed options JSON, invalid parameters).
+          description: Bad request (empty 0-byte file, malformed options JSON, or invalid parameters).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload too large (file exceeds maximum size limit of 50MB for documents/images, 100MB for audio).
           content:
             application/json:
               schema:
@@ -228,6 +234,8 @@ paths:
         Full-duplex WebSocket connection used to stream incremental Markdown chunks,
         operational progress updates, and completion metadata directly to the frontend.
         Client initiates HTTP Upgrade to WebSocket at `ws://localhost:8000/api/v1/ws/stream/{job_id}`.
+        
+        Close Codes: 1000 (Normal Completion), 1008 (Invalid Job ID / Expired), 1011 (Internal Pipeline Failure), 4499 (Client Cancelled).
       operationId: streamJobWebSocket
       parameters:
         - name: job_id
