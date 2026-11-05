@@ -207,30 +207,30 @@ export const ExportBar: React.FC<ExportBarProps> = ({
   };
 
   return (
-    <footer className="h-11 bg-slate-900/90 backdrop-blur-md border-t border-slate-800 px-3 sm:px-4 flex items-center justify-between text-xs select-none z-30 shrink-0">
+    <footer className="h-11 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-3 sm:px-4 flex items-center justify-between text-xs select-none z-30 shrink-0 transition-colors duration-200">
       {/* Telemetry & Stats */}
-      <div className="flex items-center gap-2 sm:gap-4 text-slate-400">
+      <div className="flex items-center gap-2 sm:gap-4 text-slate-600 dark:text-slate-400">
         <div className="flex items-center gap-1.5">
           <span
             className={`w-2 h-2 rounded-full ${
-              isBackendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'
+              isBackendConnected ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400 dark:bg-slate-500'
             }`}
           />
-          <span className="font-mono text-[11px] text-slate-300">
+          <span className="font-mono text-[11px] text-slate-700 dark:text-slate-300">
             {isBackendConnected ? t.connected : t.offline}
           </span>
         </div>
 
-        <div className="h-3 w-[1px] bg-slate-800 hidden sm:block" />
+        <div className="h-3 w-[1px] bg-slate-200 dark:bg-slate-800 hidden sm:block" />
 
-        <div className="hidden sm:flex items-center gap-3 text-slate-400 text-[11px]">
+        <div className="hidden sm:flex items-center gap-3 text-slate-500 dark:text-slate-400 text-[11px]">
           <span>
-            <strong className="text-slate-200 font-mono">{stats.words}</strong> {t.words}
+            <strong className="text-slate-800 dark:text-slate-200 font-mono">{stats.words}</strong> {t.words}
           </span>
           <span>
-            <strong className="text-slate-200 font-mono">{stats.chars}</strong> {t.chars}
+            <strong className="text-slate-800 dark:text-slate-200 font-mono">{stats.chars}</strong> {t.chars}
           </span>
-          <span className="flex items-center gap-1 text-slate-500">
+          <span className="flex items-center gap-1 text-slate-400 dark:text-slate-500">
             <Clock className="w-3 h-3" />
             {stats.readingTime}
           </span>
@@ -243,10 +243,10 @@ export const ExportBar: React.FC<ExportBarProps> = ({
         <button
           type="button"
           onClick={handleCopyMarkdown}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium transition-all ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium transition-all shadow-sm ${
             copied
-              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60'
+              ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30'
+              : 'bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700/60'
           }`}
           title={t.copy}
         >
@@ -258,7 +258,7 @@ export const ExportBar: React.FC<ExportBarProps> = ({
         <button
           type="button"
           onClick={handleDownloadMd}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-all"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700/60 shadow-sm transition-all"
           title={t.downloadMd}
         >
           <Download className="w-3.5 h-3.5" />
@@ -269,7 +269,7 @@ export const ExportBar: React.FC<ExportBarProps> = ({
         <button
           type="button"
           onClick={handleExportHtml}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-all"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700/60 shadow-sm transition-all"
           title={t.downloadHtml}
         >
           <FileCode className="w-3.5 h-3.5" />
@@ -301,22 +301,22 @@ export const ExportBar: React.FC<ExportBarProps> = ({
 
           {/* PDF Dropdown Menu */}
           {showPdfMenu && (
-            <div className="absolute right-0 bottom-full mb-1 w-52 bg-slate-900 border border-slate-800 rounded-lg shadow-xl py-1 text-xs text-slate-200 z-50 animate-in fade-in">
+            <div className="absolute right-0 bottom-full mb-1 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-xl py-1 text-xs text-slate-700 dark:text-slate-200 z-50 animate-in fade-in">
               <button
                 type="button"
                 onClick={handleQuickPrint}
-                className="w-full text-left px-3 py-1.5 hover:bg-slate-800 flex items-center gap-2"
+                className="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2"
               >
-                <Printer className="w-3.5 h-3.5 text-indigo-400" />
+                <Printer className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
                 <span>{t.quickPrint}</span>
               </button>
               <button
                 type="button"
                 onClick={handleServerPdf}
                 disabled={isExportingPdf}
-                className="w-full text-left px-3 py-1.5 hover:bg-slate-800 flex items-center gap-2 disabled:opacity-50"
+                className="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 disabled:opacity-50"
               >
-                <FileText className="w-3.5 h-3.5 text-emerald-400" />
+                <FileText className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                 <span>{isExportingPdf ? 'Compiling...' : t.serverPdf}</span>
               </button>
             </div>

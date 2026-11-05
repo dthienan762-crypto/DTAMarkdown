@@ -2,6 +2,7 @@
 DTAMarkdown Studio - Backend Configuration.
 """
 
+import os
 import sys
 from pathlib import Path
 import tempfile
@@ -24,16 +25,18 @@ class Settings:
     # Server Settings
     APP_NAME: str = "DTAMarkdown Studio API"
     VERSION: str = "1.0.0"
-    HOST: str = "0.0.0.0"
-    PORT: int = 8000
-    DEBUG: bool = False
+    HOST: str = os.environ.get("HOST", "0.0.0.0")
+    PORT: int = int(os.environ.get("PORT", "8000"))
+    DEBUG: bool = os.environ.get("DEBUG", "false").lower() in ("1", "true", "yes")
 
     # CORS Configuration
     CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
+        "http://localhost:5000",
         "http://localhost:5173",
         "http://localhost:8000",
         "http://127.0.0.1:3000",
+        "http://127.0.0.1:5000",
         "http://127.0.0.1:5173",
         "http://127.0.0.1:8000",
         "*",

@@ -153,14 +153,14 @@ export const LiveEditor: React.FC<LiveEditorProps> = ({
   );
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-slate-950">
+    <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-slate-950 transition-colors duration-200">
       {/* Editor Toolbar */}
       {viewMode !== 'preview' && (
-        <div className="h-10 bg-slate-900/80 border-b border-slate-800 px-3 sm:px-4 flex items-center gap-1 shrink-0 overflow-x-auto text-slate-400 select-none">
+        <div className="h-10 bg-slate-100/90 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 px-3 sm:px-4 flex items-center gap-1 shrink-0 overflow-x-auto text-slate-600 dark:text-slate-400 select-none">
           <button
             type="button"
             onClick={() => insertFormatting('**', '**', locale === 'vi' ? 'chữ đậm' : 'bold text')}
-            className="p-1.5 hover:text-slate-200 hover:bg-slate-800 rounded transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded transition-colors"
             title={t.bold}
           >
             <Bold className="w-3.5 h-3.5" />
@@ -173,11 +173,11 @@ export const LiveEditor: React.FC<LiveEditorProps> = ({
           >
             <Italic className="w-3.5 h-3.5" />
           </button>
-          <div className="h-4 w-[1px] bg-slate-800 mx-1" />
+          <div className="h-4 w-[1px] bg-slate-300 dark:bg-slate-800 mx-1" />
           <button
             type="button"
             onClick={() => insertFormatting('# ', '', locale === 'vi' ? 'Tiêu Đề 1' : 'Heading 1')}
-            className="p-1.5 hover:text-slate-200 hover:bg-slate-800 rounded transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded transition-colors"
             title={t.heading1}
           >
             <Heading1 className="w-3.5 h-3.5" />
@@ -185,12 +185,12 @@ export const LiveEditor: React.FC<LiveEditorProps> = ({
           <button
             type="button"
             onClick={() => insertFormatting('## ', '', locale === 'vi' ? 'Tiêu Đề 2' : 'Heading 2')}
-            className="p-1.5 hover:text-slate-200 hover:bg-slate-800 rounded transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded transition-colors"
             title={t.heading2}
           >
             <Heading2 className="w-3.5 h-3.5" />
           </button>
-          <div className="h-4 w-[1px] bg-slate-800 mx-1" />
+          <div className="h-4 w-[1px] bg-slate-300 dark:bg-slate-800 mx-1" />
           <button
             type="button"
             onClick={() =>
@@ -200,7 +200,7 @@ export const LiveEditor: React.FC<LiveEditorProps> = ({
                   : '\n| Column 1 | Column 2 | Column 3 |\n|---|---|---|\n| Data A | Data B | Data C |\n'
               )
             }
-            className="p-1.5 hover:text-slate-200 hover:bg-slate-800 rounded transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded transition-colors"
             title={t.insertTable}
           >
             <TableIcon className="w-3.5 h-3.5" />
@@ -208,15 +208,15 @@ export const LiveEditor: React.FC<LiveEditorProps> = ({
           <button
             type="button"
             onClick={() => insertFormatting('$$\n', '\n$$', 'f(x) = \\sum_{i=1}^n x_i')}
-            className="p-1.5 hover:text-slate-200 hover:bg-slate-800 rounded transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded transition-colors"
             title={t.insertMath}
           >
-            <Sigma className="w-3.5 h-3.5 text-indigo-400" />
+            <Sigma className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
           </button>
           <button
             type="button"
             onClick={() => insertFormatting('```typescript\n', '\n```', '// code')}
-            className="p-1.5 hover:text-slate-200 hover:bg-slate-800 rounded transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded transition-colors"
             title={t.insertCode}
           >
             <Code className="w-3.5 h-3.5" />
@@ -230,22 +230,22 @@ export const LiveEditor: React.FC<LiveEditorProps> = ({
                   : '```mermaid\ngraph TD\n  A[Start] --> B{Evaluate}\n  B -->|Pass| C[Markdown Studio]\n  B -->|Fail| D[Retry]\n```\n'
               )
             }
-            className="p-1.5 hover:text-slate-200 hover:bg-slate-800 rounded transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded transition-colors"
             title={t.insertMermaid}
           >
-            <GitBranch className="w-3.5 h-3.5 text-purple-400" />
+            <GitBranch className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" />
           </button>
           <button
             type="button"
             onClick={() => insertFormatting('- ', '', locale === 'vi' ? 'Mục danh sách' : 'List item')}
-            className="p-1.5 hover:text-slate-200 hover:bg-slate-800 rounded transition-colors"
+            className="p-1.5 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded transition-colors"
             title={t.insertList}
           >
             <List className="w-3.5 h-3.5" />
           </button>
 
           {isStreaming && (
-            <div className="ml-auto flex items-center gap-1.5 text-xs text-indigo-400 animate-pulse">
+            <div className="ml-auto flex items-center gap-1.5 text-xs text-indigo-500 dark:text-indigo-400 animate-pulse">
               <span className="w-2 h-2 rounded-full bg-indigo-500" />
               <span>{t.streamingInput}</span>
             </div>
@@ -258,7 +258,7 @@ export const LiveEditor: React.FC<LiveEditorProps> = ({
         {/* Editor Pane (Left) */}
         {viewMode !== 'preview' && (
           <div
-            className={`h-full flex flex-col min-h-0 border-r border-slate-800 ${
+            className={`h-full flex flex-col min-h-0 border-r border-slate-200 dark:border-slate-800 ${
               viewMode === 'split' ? 'w-1/2' : 'w-full'
             }`}
           >

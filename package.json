@@ -2,11 +2,13 @@
   "name": "dtamarkdown-studio",
   "version": "1.0.0",
   "private": true,
-  "description": "DTAMarkdown Studio - Production Multimodal Markdown Studio",
+  "description": "DTAMarkdown Studio - Production Multimodal Markdown Studio (Bilingual Vietnamese & English)",
   "scripts": {
     "dev": "npm --prefix frontend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "python backend/run.py",
     "build": "npm --prefix frontend run build",
-    "test": "npm --prefix frontend test"
+    "test": "npm --prefix frontend test",
+    "start": "python backend/run.py"
   }
 }
-
