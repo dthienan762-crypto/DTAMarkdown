@@ -45,7 +45,7 @@ npx vercel --prod
    - **Build Command**: `npm run build`
    - **Output Directory**: `frontend/dist`
 4. Bấm **Deploy**. Bạn sẽ có link dạng:
-   👉 `https://dtamarkdown-studio.vercel.app`
+   👉 `https://dtamarkdown.vercel.app/`
 
 ---
 

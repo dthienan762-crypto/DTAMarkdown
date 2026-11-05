@@ -5,7 +5,7 @@
   "description": "DTAMarkdown Studio - Production Multimodal Markdown Studio (Bilingual Vietnamese & English)",
   "author": "Đinh Thiên Ân <dthienan762@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/dthienan762-crypto/DTAMarkdown",
+  "homepage": "https://dtamarkdown.vercel.app/",
   "repository": {
     "type": "git",
     "url": "https://github.com/dthienan762-crypto/DTAMarkdown.git"

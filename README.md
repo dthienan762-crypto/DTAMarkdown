@@ -3,7 +3,7 @@
 > **Tác giả / Creator & Lead Developer**: **Đinh Thiên Ân**  
 > 📧 Email: [dthienan762@gmail.com](mailto:dthienan762@gmail.com)  
 > 🌐 GitHub Repository: [https://github.com/dthienan762-crypto/DTAMarkdown](https://github.com/dthienan762-crypto/DTAMarkdown)  
-> 🚀 **Public Live Demo**: [https://swift-silver-kyiiv47.tmp.now](https://swift-silver-kyiiv47.tmp.now)  
+> 🚀 **Public Live Website**: [https://dtamarkdown.vercel.app/](https://dtamarkdown.vercel.app/)  
 > 📜 License: **MIT License** (Copyright © 2026 Đinh Thiên Ân)
 
 ---
@@ -153,6 +153,7 @@ All components strictly follow pre-published specifications in `/docs/specs/`:
 - **Email liên hệ**: [dthienan762@gmail.com](mailto:dthienan762@gmail.com)
 - **GitHub**: [@dthienan762-crypto](https://github.com/dthienan762-crypto)
 - **Dự án**: [DTAMarkdown Studio](https://github.com/dthienan762-crypto/DTAMarkdown)
+- **Website sản phẩm (Live Web)**: [https://dtamarkdown.vercel.app/](https://dtamarkdown.vercel.app/)
 
 ---
 
