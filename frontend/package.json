@@ -3,8 +3,14 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "author": "Đinh Thiên Ân <dthienan762@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dthienan762-crypto/DTAMarkdown.git"
+  },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --open",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest run"

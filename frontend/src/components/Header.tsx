@@ -55,6 +55,15 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-[10px] sm:text-xs px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-mono font-medium border border-indigo-200 dark:border-indigo-500/20">
               Studio
             </span>
+            <a
+              href="https://github.com/dthienan762-crypto/DTAMarkdown"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors hidden sm:inline"
+              title="Tác giả: Đinh Thiên Ân (dthienan762@gmail.com)"
+            >
+              by Đinh Thiên Ân
+            </a>
           </div>
           <div className="text-[10px] text-slate-500 dark:text-slate-400 hidden lg:block">
             {t.brandSubtitle}

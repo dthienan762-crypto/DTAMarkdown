@@ -6,6 +6,7 @@ import { EditorView } from '@codemirror/view';
 import { MarkdownPreview } from './MarkdownPreview';
 import { ViewMode } from './Header';
 import { Locale, translations } from '../lib/i18n';
+import { useTheme } from '../context/ThemeContext';
 import {
   Bold,
   Italic,
@@ -33,6 +34,9 @@ export const LiveEditor: React.FC<LiveEditorProps> = ({
   locale = 'vi',
   isStreaming = false,
 }) => {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+
   const cmRef = useRef<ReactCodeMirrorRef | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
   const t = translations[locale];
@@ -128,7 +132,8 @@ export const LiveEditor: React.FC<LiveEditorProps> = ({
       EditorView.theme({
         '&': {
           height: '100%',
-          backgroundColor: '#020617',
+          backgroundColor: isDark ? '#020617' : '#ffffff',
+          color: isDark ? '#f1f5f9' : '#0f172a',
           fontSize: '13px',
           fontFamily: '"JetBrains Mono", Consolas, Menlo, monospace',
         },
@@ -137,19 +142,19 @@ export const LiveEditor: React.FC<LiveEditorProps> = ({
           lineHeight: '1.65',
         },
         '.cm-gutters': {
-          backgroundColor: '#090d16',
-          color: '#475569',
-          borderRight: '1px solid #1e293b',
+          backgroundColor: isDark ? '#090d16' : '#f8fafc',
+          color: isDark ? '#475569' : '#94a3b8',
+          borderRight: isDark ? '1px solid #1e293b' : '1px solid #e2e8f0',
         },
         '.cm-activeLine': {
-          backgroundColor: '#0f172a80',
+          backgroundColor: isDark ? '#0f172a80' : '#f1f5f980',
         },
         '.cm-activeLineGutter': {
-          backgroundColor: '#1e293b60',
-          color: '#cbd5e1',
+          backgroundColor: isDark ? '#1e293b60' : '#e2e8f080',
+          color: isDark ? '#cbd5e1' : '#334155',
         },
       }),
-    []
+    [isDark]
   );
 
   return (
@@ -267,7 +272,7 @@ export const LiveEditor: React.FC<LiveEditorProps> = ({
                 ref={cmRef}
                 value={content}
                 height="100%"
-                theme={oneDark}
+                theme={isDark ? oneDark : undefined}
                 extensions={[markdown(), editorTheme]}
                 onChange={onChange}
                 className="h-full"

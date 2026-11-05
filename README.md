@@ -1,5 +1,13 @@
 # DTAMarkdown Studio
 
+> **Tác giả / Creator & Lead Developer**: **Đinh Thiên Ân**  
+> 📧 Email: [dthienan762@gmail.com](mailto:dthienan762@gmail.com)  
+> 🌐 GitHub Repository: [https://github.com/dthienan762-crypto/DTAMarkdown](https://github.com/dthienan762-crypto/DTAMarkdown)  
+> 🚀 **Public Live Demo**: [https://swift-silver-kyiiv47.tmp.now](https://swift-silver-kyiiv47.tmp.now)  
+> 📜 License: **MIT License** (Copyright © 2026 Đinh Thiên Ân)
+
+---
+
 > Production-grade full-stack multimodal Markdown conversion workbench. Transform scanned documents, degraded images, voice recordings, messy HTML, and raw unstructured text into pristine GitHub Flavored Markdown (GFM) with preserved tables, KaTeX math formulas, Mermaid diagrams, and automatic Tables of Contents.
 
 ---
@@ -136,3 +144,19 @@ All components strictly follow pre-published specifications in `/docs/specs/`:
 - **`core_principles.md`**: Core technical tenets including Contract-First, Non-Blocking Real-time Streaming, Zero Data Leakage & Tempfile Lifecycle, Zero-CLI Binary Dependency, KaTeX Math & Table Structural Integrity, and Graceful Degradation.
 - **`product_ux.md`**: Visual design system, responsive layout wireframes, user interaction workflows (Clipboard paste, drag-and-drop, mic waveform, split editor), and keyboard shortcuts.
 - **`api_contract.yaml`**: Full OpenAPI 3.1.0 schema defining REST conversion/export endpoints and bidirectional WebSocket streaming frames.
+
+---
+
+## 👨‍💻 Author & Credits (Tác giả)
+
+- **Người sáng tạo & Phát triển chính (Author & Creator)**: **Đinh Thiên Ân**
+- **Email liên hệ**: [dthienan762@gmail.com](mailto:dthienan762@gmail.com)
+- **GitHub**: [@dthienan762-crypto](https://github.com/dthienan762-crypto)
+- **Dự án**: [DTAMarkdown Studio](https://github.com/dthienan762-crypto/DTAMarkdown)
+
+---
+
+## 📄 Giấy phép (License)
+
+Dự án này được phân phối dưới giấy phép **MIT License**. Xem chi tiết tại tệp [`LICENSE`](./LICENSE).  
+Copyright (c) 2026 **Đinh Thiên Ân** (`dthienan762@gmail.com`). All rights reserved.

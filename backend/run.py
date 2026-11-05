@@ -3,6 +3,9 @@ DTAMarkdown Studio - Server Entrypoint.
 """
 
 import sys
+import threading
+import time
+import webbrowser
 from pathlib import Path
 
 # Add backend and backend/.deps to sys.path
@@ -32,6 +35,19 @@ import uvicorn
 from backend.app.config import settings
 
 if __name__ == "__main__":
+    should_open = "--open" in sys.argv or "-o" in sys.argv or True
+
+    if should_open:
+        def _open_browser():
+            time.sleep(1.2)
+            url = f"http://localhost:{settings.PORT}/"
+            try:
+                webbrowser.open_new_tab(url)
+            except Exception:
+                pass
+
+        threading.Thread(target=_open_browser, daemon=True).start()
+
     uvicorn.run(
         "backend.app.main:app",
         host=settings.HOST,

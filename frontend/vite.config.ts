@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       strictPort: false,
+      open: true, // Automatically open default browser when dev server starts
       proxy: {
         '/api': {
           target: backendTarget,
