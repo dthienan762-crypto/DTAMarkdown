@@ -7,8 +7,12 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://dtamarkdown-studio-api.onrender.com/api/:path*"
+      "source": "/api/v1/health",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/api/v1/convert/text",
+      "destination": "/api/convert-text"
     },
     {
       "source": "/(.*)",
@@ -27,4 +31,3 @@
     }
   ]
 }
-

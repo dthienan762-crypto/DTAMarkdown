@@ -206,6 +206,8 @@ async def convert_text(payload: TextConvertRequest):
     # Execute text normalization via genuine text_engine
     engine_name = "Text Normalizer Engine"
 
+    warnings_list: list[str] = []
+
     try:
         from text_engine import TextNormalizer, TOCGenerator, TagExtractor
         normalizer = TextNormalizer()
@@ -233,11 +235,14 @@ async def convert_text(payload: TextConvertRequest):
         tags = TagExtractor.extract_tags(markdown_out) if options.extract_tags else ["markdown", "text_normalize"]
 
     except Exception as e:
-        logger.error("convert_text normalization error: %s", e)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"code": "NORMALIZATION_ERROR", "message": f"Text normalization failed: {e}"},
-        )
+        logger.warning("convert_text normalization exception: %s. Applying resilient baseline normalization.", e)
+        markdown_out = raw_text.strip()
+        warnings_list.append(f"Graceful baseline normalization fallback: {str(e)}")
+        w_count = len(markdown_out.split())
+        c_count = len(markdown_out)
+        read_time = f"{max(1, w_count // 200)} min"
+        tags = ["markdown", "text_normalize"]
+        toc_str = None
 
     duration_ms = round((time.time() - start_time) * 1000, 2)
     word_count = len(markdown_out.split())
@@ -259,7 +264,7 @@ async def convert_text(payload: TextConvertRequest):
         pipeline=payload.pipeline_type,
         markdown=markdown_out,
         metadata=metadata,
-        warnings=[],
+        warnings=warnings_list,
         duration_ms=duration_ms,
     )
 

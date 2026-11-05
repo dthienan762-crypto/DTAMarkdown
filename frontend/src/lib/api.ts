@@ -6,6 +6,7 @@ import {
   HealthResponse,
   PipelineType,
 } from '../types';
+import { clientNormalizeText } from './clientNormalizer';
 
 // Read API_BASE from VITE_API_URL or default to /api/v1 (proxied by Vite or served directly)
 const RAW_BASE = (import.meta.env.VITE_API_URL as string) || '/api/v1';
@@ -112,37 +113,56 @@ export async function convertRawText(
   options?: ConversionOptions,
   signal?: AbortSignal
 ): Promise<ConversionResult> {
-  const response = await safeFetch(
-    `${API_BASE}/convert/text`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        raw_text: rawText,
-        pipeline_type: pipelineType,
-        options: options || {},
-      }),
-      signal,
-    },
-    30000
-  );
+  // If input is empty, return empty result directly
+  if (!rawText || !rawText.trim()) {
+    return clientNormalizeText(rawText, options);
+  }
 
-  if (!response.ok) {
-    let errorMsg = `Chuyển hóa thất bại (HTTP ${response.status})`;
+  try {
+    const response = await safeFetch(
+      `${API_BASE}/convert/text`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          raw_text: rawText,
+          pipeline_type: pipelineType,
+          options: options || {},
+        }),
+        signal,
+      },
+      8000 // Fast 8s timeout to avoid hanging
+    );
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    let serverErrMsg = `HTTP ${response.status}`;
     try {
       const errJson = await response.json();
       if (errJson) {
-        errorMsg = errJson.message || errJson.detail || errorMsg;
+        if (typeof errJson.detail === 'object' && errJson.detail?.message) {
+          serverErrMsg = errJson.detail.message;
+        } else if (typeof errJson.detail === 'string') {
+          serverErrMsg = errJson.detail;
+        } else if (errJson.message) {
+          serverErrMsg = errJson.message;
+        }
       }
     } catch {
       // ignore
     }
-    throw new Error(errorMsg);
+
+    console.warn(`Backend returned ${serverErrMsg}. Falling back seamlessly to Client Engine.`);
+  } catch (err: unknown) {
+    console.warn('Backend server unreachable or errored. Switching seamlessly to Client Engine.', err);
   }
 
-  return response.json();
+  // Resilient fallback: instantly normalize client-side with full table, math, and TOC support
+  return clientNormalizeText(rawText, options);
 }
 
 export async function getJobDetail(

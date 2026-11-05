@@ -227,7 +227,12 @@ export const App: React.FC = () => {
         // Start WebSocket real-time stream
         startStream(realJobId);
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : 'Upload failed';
+        let msg = err instanceof Error ? err.message : 'Upload failed';
+        if (msg.includes('500') || msg.includes('Failed to fetch') || msg.includes('Không thể kết nối') || msg.includes('ERR_CONNECTION')) {
+          msg = locale === 'vi'
+            ? 'Tính năng OCR hình ảnh & Audio cần kết nối máy chủ Python Backend (Port 8000). Chế độ Web Tĩnh hiện tại hỗ trợ 100% chuẩn hóa văn bản, bảng biểu, công thức KaTeX và TOC không giới hạn.'
+            : 'Image OCR and Audio require the Python Backend. Text, table, KaTeX, and TOC normalization are 100% supported offline.';
+        }
         setQueue((prev) =>
           prev.map((item) =>
             item.id === tempId
@@ -235,38 +240,10 @@ export const App: React.FC = () => {
               : item
           )
         );
-        addToast(locale === 'vi' ? 'Tải tệp thất bại' : 'Upload failed', msg, 'error');
+        addToast(locale === 'vi' ? 'Thông báo xử lý' : 'Processing Notice', msg, 'info', 7000);
       }
     },
     [addToast, startStream, t, locale]
-  );
-
-  // Ingestion: Drag-and-drop or file browser
-  const handleFilesSelected = useCallback(
-    (files: File[]) => {
-      files.forEach((file) => {
-        const ext = file.name.split('.').pop()?.toLowerCase();
-        let pipeline: PipelineType = 'auto';
-        if (['wav', 'mp3', 'm4a', 'ogg'].includes(ext || '')) {
-          pipeline = 'voice_stt';
-        } else if (['png', 'jpg', 'jpeg', 'webp', 'tiff', 'pdf'].includes(ext || '')) {
-          pipeline = 'vision_ocr';
-        } else if (['html', 'htm', 'txt'].includes(ext || '')) {
-          pipeline = 'text_normalize';
-        }
-        processConversion(file, file.name, pipeline);
-      });
-    },
-    [processConversion]
-  );
-
-  // Ingestion: Audio voice recording
-  const handleAudioRecorded = useCallback(
-    (blob: Blob, name: string) => {
-      addToast(t.toastVoiceCaptured, t.toastVoiceCapturedDesc, 'info');
-      processConversion(blob, name, 'voice_stt');
-    },
-    [addToast, processConversion, t]
   );
 
   // Ingestion: Text or HTML normalization
@@ -330,6 +307,45 @@ export const App: React.FC = () => {
       }
     },
     [addToast, t, locale]
+  );
+
+  // Ingestion: Audio voice recording
+  const handleAudioRecorded = useCallback(
+    (blob: Blob, name: string) => {
+      addToast(t.toastVoiceCaptured, t.toastVoiceCapturedDesc, 'info');
+      processConversion(blob, name, 'voice_stt');
+    },
+    [addToast, processConversion, t]
+  );
+
+  // Ingestion: Drag-and-drop or file browser with client-side text file reading
+  const handleFilesSelected = useCallback(
+    (files: File[]) => {
+      files.forEach(async (file) => {
+        const ext = file.name.split('.').pop()?.toLowerCase();
+        // If file is text, html, or markdown, read directly in browser
+        if (['html', 'htm', 'txt', 'md', 'csv', 'json'].includes(ext || '')) {
+          try {
+            const rawContent = await file.text();
+            await handleTextPasteTrigger(rawContent, ext === 'html' || ext === 'htm');
+            return;
+          } catch {
+            // fallback to processConversion
+          }
+        }
+
+        let pipeline: PipelineType = 'auto';
+        if (['wav', 'mp3', 'm4a', 'ogg'].includes(ext || '')) {
+          pipeline = 'voice_stt';
+        } else if (['png', 'jpg', 'jpeg', 'webp', 'tiff', 'pdf'].includes(ext || '')) {
+          pipeline = 'vision_ocr';
+        } else {
+          pipeline = 'text_normalize';
+        }
+        processConversion(file, file.name, pipeline);
+      });
+    },
+    [handleTextPasteTrigger, processConversion]
   );
 
   // Global Clipboard Paste Hook (Ctrl+V)

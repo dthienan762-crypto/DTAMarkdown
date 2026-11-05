@@ -36,3 +36,4 @@ Start-Process $appUrl
 # 5. Chạy Frontend Vite Dev Server
 Write-Host "Khởi động Frontend Vite Dev server..." -ForegroundColor Cyan
 npm --prefix frontend run dev
+
