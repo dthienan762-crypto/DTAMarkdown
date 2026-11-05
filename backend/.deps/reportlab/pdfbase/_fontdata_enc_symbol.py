@@ -1,3 +1,4 @@
+
 SymbolEncoding = (
                     None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                     None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'space',
