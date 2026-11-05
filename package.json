@@ -1,0 +1,12 @@
+{
+  "name": "dtamarkdown-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DTAMarkdown Studio - Production Multimodal Markdown Studio",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "test": "npm --prefix frontend test"
+  }
+}
+
