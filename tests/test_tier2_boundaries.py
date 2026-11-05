@@ -41,8 +41,8 @@ def sanitize_staging_filename(raw_filename: str, job_id: str) -> str:
 
 class DefensiveFileValidator:
     """Reference implementation of backend boundary validation."""
-    MAX_DOC_SIZE = 50 * 1024 * 1024  # 50 MB
-    MAX_AUDIO_SIZE = 100 * 1024 * 1024  # 100 MB
+    MAX_DOC_SIZE = 200 * 1024 * 1024  # 200 MB
+    MAX_AUDIO_SIZE = 200 * 1024 * 1024  # 200 MB
 
     @classmethod
     def validate_upload(cls, file_bytes: bytes, filename: str) -> dict:
@@ -151,9 +151,9 @@ def test_tier2_corrupt_non_audio_payload():
 
 
 def test_tier2_oversized_file_limit_enforcement():
-    """Verify file exceeding 50MB returns 413 Payload Too Large."""
-    # Virtual 52MB file check without allocating physical disk
-    virtual_oversized = b"P" * (52 * 1024 * 1024)
+    """Verify file exceeding 200MB returns 413 Payload Too Large."""
+    # Virtual 202MB file check without allocating physical disk
+    virtual_oversized = b"P" * (202 * 1024 * 1024)
     res = DefensiveFileValidator.validate_upload(virtual_oversized, "giant_document.pdf")
     assert res["status_code"] == 413
     assert res["error_code"] == "PAYLOAD_TOO_LARGE"

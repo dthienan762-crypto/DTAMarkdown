@@ -55,7 +55,7 @@ class VoiceSTTEngine:
     Completely eliminates dependencies on external system ffmpeg executables.
     """
 
-    MAX_AUDIO_SIZE = 100 * 1024 * 1024  # 100MB limit per api_contract.yaml
+    MAX_AUDIO_SIZE = 200 * 1024 * 1024  # 200MB limit per api_contract.yaml
     SUPPORTED_WAV_EXTENSIONS = {".wav"}
     OTHER_AUDIO_EXTENSIONS = {".mp3", ".ogg", ".flac", ".m4a"}
 
@@ -81,7 +81,7 @@ class VoiceSTTEngine:
 
     def validate_audio_file(self, file_path: Path) -> Tuple[str, int]:
         """
-        Validates file existence, 0-byte boundary, 100MB size limit, and audio format.
+        Validates file existence, 0-byte boundary, 200MB size limit, and audio format.
         """
         if not file_path.exists():
             raise PipelineError(f"Audio file not found: {file_path}", code="FILE_NOT_FOUND")
@@ -92,7 +92,7 @@ class VoiceSTTEngine:
 
         if size > self.MAX_AUDIO_SIZE:
             raise PipelineError(
-                f"Payload too large: audio size ({size} bytes) exceeds 100MB limit.",
+                f"Payload too large: audio size ({size} bytes) exceeds 200MB limit.",
                 code="PAYLOAD_TOO_LARGE"
             )
 

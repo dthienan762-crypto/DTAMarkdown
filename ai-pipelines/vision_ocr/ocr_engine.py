@@ -53,7 +53,7 @@ class VisionOCREngine:
     boundary validation, table layout preservation, and KaTeX extraction.
     """
 
-    MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+    MAX_FILE_SIZE = 200 * 1024 * 1024  # 200MB
     SUPPORTED_PDF_EXTENSIONS = {".pdf"}
     SUPPORTED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tiff", ".tif", ".bmp", ".webp"}
 
@@ -76,7 +76,7 @@ class VisionOCREngine:
 
     def validate_file(self, file_path: Path) -> Tuple[str, int]:
         """
-        Validates file existence, non-empty size, 50MB boundary, and media format.
+        Validates file existence, non-empty size, 200MB boundary, and media format.
         Returns:
             category: 'pdf' or 'image'
             file_size: size in bytes
@@ -90,7 +90,7 @@ class VisionOCREngine:
 
         if size > self.MAX_FILE_SIZE:
             raise PipelineError(
-                f"Payload too large: file size ({size} bytes) exceeds 50MB limit.",
+                f"Payload too large: file size ({size} bytes) exceeds 200MB limit.",
                 code="PAYLOAD_TOO_LARGE"
             )
 

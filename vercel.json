@@ -15,6 +15,14 @@
       "destination": "/api/convert-text"
     },
     {
+      "source": "/api/v1/convert/file",
+      "destination": "/api/convert-file"
+    },
+    {
+      "source": "/api/v1/export/pdf",
+      "destination": "/api/export-pdf"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

@@ -18,6 +18,8 @@ import {
   convertRawText,
   checkServerHealth,
 } from './lib/api';
+import { clientNormalizeText } from './lib/clientNormalizer';
+import { extractPdfTextFromFile } from './lib/pdfExtractor';
 
 export const App: React.FC = () => {
   const [locale, setLocale] = useState<Locale>(() => {
@@ -39,6 +41,7 @@ export const App: React.FC = () => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [serverHealth, setServerHealth] = useState<HealthResponse | null>(null);
   const [isHealthChecking, setIsHealthChecking] = useState<boolean>(true);
+  const isBackendConnected = Boolean(serverHealth);
 
   const activeJobIdRef = useRef<string | null>(null);
   const t = translations[locale];
@@ -227,11 +230,51 @@ export const App: React.FC = () => {
         // Start WebSocket real-time stream
         startStream(realJobId);
       } catch (err: unknown) {
+        // Fallback for PDF documents when backend is offline or on Vercel
+        if (file instanceof File && file.name.toLowerCase().endsWith('.pdf')) {
+          try {
+            const extractedPdfText = await extractPdfTextFromFile(file);
+            if (extractedPdfText && extractedPdfText.trim().length > 0) {
+              const normalized = clientNormalizeText(extractedPdfText, {
+                extract_tables: true,
+                extract_math: true,
+                generate_toc: true,
+                extract_tags: true,
+              });
+              setMarkdown(normalized.markdown);
+              setQueue((prev) =>
+                prev.map((item) =>
+                  item.id === tempId
+                    ? {
+                        ...item,
+                        status: 'COMPLETED',
+                        progress: 100,
+                        stage: t.statusReady,
+                        markdown: normalized.markdown,
+                        metadata: normalized.metadata,
+                      }
+                    : item
+                )
+              );
+              addToast(
+                locale === 'vi' ? 'Chuyển đổi PDF thành công' : 'PDF Converted',
+                locale === 'vi'
+                  ? `Đã trích xuất văn bản, bảng biểu và công thức từ ${file.name} sang Markdown GFM.`
+                  : `Successfully extracted and normalized ${file.name} into GFM Markdown.`,
+                'success'
+              );
+              return;
+            }
+          } catch (pdfErr) {
+            console.warn('Browser-native PDF extraction error:', pdfErr);
+          }
+        }
+
         let msg = err instanceof Error ? err.message : 'Upload failed';
-        if (msg.includes('500') || msg.includes('Failed to fetch') || msg.includes('Không thể kết nối') || msg.includes('ERR_CONNECTION')) {
+        if (msg.includes('500') || msg.includes('404') || msg.includes('Failed to fetch') || msg.includes('Không thể kết nối') || msg.includes('ERR_CONNECTION')) {
           msg = locale === 'vi'
-            ? 'Tính năng OCR hình ảnh & Audio cần kết nối máy chủ Python Backend (Port 8000). Chế độ Web Tĩnh hiện tại hỗ trợ 100% chuẩn hóa văn bản, bảng biểu, công thức KaTeX và TOC không giới hạn.'
-            : 'Image OCR and Audio require the Python Backend. Text, table, KaTeX, and TOC normalization are 100% supported offline.';
+            ? 'Tài liệu cần kết nối máy chủ Python Backend (Port 8000) để kích hoạt Vision OCR cho ảnh scan hoặc nhận dạng giọng nói. Chế độ Web hiện tại hỗ trợ 100% chuẩn hóa văn bản, tài liệu PDF số, bảng biểu và công thức KaTeX.'
+            : 'Scanned image OCR and audio require the Python Backend (Port 8000). Digital PDFs, tables, text, and KaTeX math are 100% supported offline.';
         }
         setQueue((prev) =>
           prev.map((item) =>
@@ -322,6 +365,18 @@ export const App: React.FC = () => {
   const handleFilesSelected = useCallback(
     (files: File[]) => {
       files.forEach(async (file) => {
+        // Enforce 200MB maximum file size limit
+        if (file.size > 200 * 1024 * 1024) {
+          addToast(
+            locale === 'vi' ? 'Tệp vượt quá 200MB' : 'File Exceeds 200MB',
+            locale === 'vi'
+              ? `Tệp ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)}MB) vượt quá dung lượng tối đa 200MB.`
+              : `File ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)}MB) exceeds maximum limit of 200MB.`,
+            'error'
+          );
+          return;
+        }
+
         const ext = file.name.split('.').pop()?.toLowerCase();
         // If file is text, html, or markdown, read directly in browser
         if (['html', 'htm', 'txt', 'md', 'csv', 'json'].includes(ext || '')) {
@@ -329,6 +384,19 @@ export const App: React.FC = () => {
             const rawContent = await file.text();
             await handleTextPasteTrigger(rawContent, ext === 'html' || ext === 'htm');
             return;
+          } catch {
+            // fallback to processConversion
+          }
+        }
+
+        // Fast browser-native PDF extraction when backend is not connected
+        if (ext === 'pdf' && !isBackendConnected) {
+          try {
+            const rawPdfText = await extractPdfTextFromFile(file);
+            if (rawPdfText && rawPdfText.trim().length > 0) {
+              await handleTextPasteTrigger(rawPdfText, false);
+              return;
+            }
           } catch {
             // fallback to processConversion
           }
@@ -345,7 +413,7 @@ export const App: React.FC = () => {
         processConversion(file, file.name, pipeline);
       });
     },
-    [handleTextPasteTrigger, processConversion]
+    [handleTextPasteTrigger, processConversion, isBackendConnected, addToast, locale]
   );
 
   // Global Clipboard Paste Hook (Ctrl+V)

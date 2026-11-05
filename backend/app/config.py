@@ -47,9 +47,9 @@ class Settings:
     REAPER_INTERVAL_SECONDS: int = 600  # 10 minutes
     REAPER_MAX_AGE_SECONDS: int = 1800  # 30 minutes
 
-    # Payload Size Limits (Principle 3 & api_contract.yaml)
-    MAX_DOCUMENT_SIZE_BYTES: int = 50 * 1024 * 1024  # 50 MB
-    MAX_AUDIO_SIZE_BYTES: int = 100 * 1024 * 1024   # 100 MB
+    # Payload Size Limits (Principle 3 & api_contract.yaml - Up to 200 MB)
+    MAX_DOCUMENT_SIZE_BYTES: int = 200 * 1024 * 1024  # 200 MB
+    MAX_AUDIO_SIZE_BYTES: int = 200 * 1024 * 1024   # 200 MB
 
     # Concurrency & Resilience (Principle 2)
     MAX_CONCURRENT_JOBS: int = 4
