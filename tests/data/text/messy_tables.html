@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>Messy Enterprise Report</title></head>
+<body>
+  <h1>Quarterly Financial Review</h1>
+  <p>Overview of departmental revenues with math invariant $R_{total} = \sum_{i=1}^{k} R_i$ and unescaped ampersands: AT&T & Johnson & Johnson.</p>
+  
+  <!-- Broken Table 1: Missing closing tags and mismatched cells -->
+  <table>
+    <tr><th>Department<th>Budget<th>Actual Expenditure
+    <tr><td>Engineering<td>$850,000<td>$812,000
+    <tr><td colspan="2">Operations & Infrastructure Combined<td>$640,000
+    <tr><td>Marketing<td>$420,000<td>$445,000
+  </table>
+
+  <div>
+    <h2>Nested Legacy Table Structure</h2>
+    <!-- Nested Table: outer table contains inner table inside a cell -->
+    <table border="1">
+      <tr>
+        <td>Outer Section 1</td>
+        <td>
+          <table class="inner">
+            <tr><th>Metric</th><th>Score</th></tr>
+            <tr><td>Uptime</td><td>99.98%</td></tr>
+            <tr><td>Error Rate</td><td>0.02%</td></tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>Outer Section 2</td>
+        <td>All secondary services operational.</td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>

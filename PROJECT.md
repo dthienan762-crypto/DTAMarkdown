@@ -71,11 +71,11 @@ The project follows a 3-phase handoff workflow across 6 specialized functional d
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| M1 | Architecture Baseline & Shared Specifications | Initialize git repo, monorepo dirs, author `/docs/specs/core_principles.md`, `/docs/specs/product_ux.md`, `/docs/specs/api_contract.yaml` | None | IN_PROGRESS (Worker: 18ca2d31-7230-45ba-ba52-c471e24ad25f) |
-| M2 | Multimodal AI Pipelines Engine | Implement `/ai-pipelines/`: Vision OCR (tables + KaTeX), Voice STT (WAV, timestamps), Text Normalizer (tables, TOC, tags) | M1 | PLANNED |
-| M3 | Backend Server & Real-time Streaming | Implement `/backend/`: FastAPI REST endpoints, WebSocket streaming, JobManager queue, secure temp handling | M1 | PLANNED |
-| M4 | Frontend UI & Live Studio | Implement `/frontend/`: Vite + React + TailwindCSS, Ctrl+V paste, mic waveform visualizer, CodeMirror 6 live split editor, KaTeX/Mermaid | M1 | PLANNED |
-| E2E | E2E Testing Track | Independent track: synthetic datasets in `/tests/data/`, Tiers 1-4 opaque-box tests, Playwright browser E2E, publish `TEST_READY.md` | M1 | PLANNED |
+| M1 | Architecture Baseline & Shared Specifications | Initialize git repo, monorepo dirs, author `/docs/specs/core_principles.md`, `/docs/specs/product_ux.md`, `/docs/specs/api_contract.yaml` | None | DONE (commit 14d749d, Gate Passed) |
+| M2 | Multimodal AI Pipelines Engine | Implement `/ai-pipelines/`: Vision OCR (tables + KaTeX), Voice STT (WAV, timestamps), Text Normalizer (tables, TOC, tags) | M1 | IN_PROGRESS (Worker: 57f107b0-1776-45bb-b948-85efb812facf) |
+| M3 | Backend Server & Real-time Streaming | Implement `/backend/`: FastAPI REST endpoints, WebSocket streaming, JobManager queue, secure temp handling | M1 | IN_PROGRESS (Worker: 54a3cf81-83c6-49d1-9441-a22d317427c2) |
+| M4 | Frontend UI & Live Studio | Implement `/frontend/`: Vite + React + TailwindCSS, Ctrl+V paste, mic waveform visualizer, CodeMirror 6 live split editor, KaTeX/Mermaid | M1 | IN_PROGRESS (Worker: 49e72665-117e-45bf-8fc0-32c63110c362) |
+| E2E | E2E Testing Track | Independent track: synthetic datasets in `/tests/data/`, Tiers 1-4 opaque-box tests, Playwright browser E2E, publish `TEST_READY.md` | M1 | IN_PROGRESS (Test Writer: 4da23988-b5fb-4ddf-894f-f064167d11ac) |
 | M5 | Final Milestone: 100% E2E Pass & Hardening | Phase 1: Pass 100% of E2E tests (Tiers 1-4); Phase 2: Tier 5 Adversarial Coverage Hardening | M2, M3, M4, E2E | PLANNED |
 
 ---

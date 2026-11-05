@@ -1,0 +1,21 @@
+# Master System Specification
+
+## Unreachable Subsection Deeply Skipped
+
+The pipeline must handle unescaped pipe \| characters within descriptive sentences without breaking GFM column alignment.
+For example: Option A \| Option B \| Option C are valid choices.
+
+Mathematical collision scenario:
+$x_1 * x_2 * x_3$ represents a three-way interaction variable.
+Notice the asterisks * should not trigger italic formatting inside LaTeX.
+
+Another formula:
+$$\int_{0}^{\infty} e^{-x^2} dx = \frac{\sqrt{\pi}}{2}$$
+
+Unclosed math delimiter edge case:
+This line contains a dangling $single dollar sign that is not closed.
+
+Unicode anomalies:
+Invisible zero-width space here: []
+Non-breaking space here: [ ]
+Smart quotes: "DTAMarkdown Studio" and em-dash — robust parser.
